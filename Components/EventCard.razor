@@ -1,0 +1,49 @@
+@* Components/EventCard.razor *@
+@using System
+@using Microsoft.AspNetCore.Components
+
+<div class="event-card p-3 mb-3 border rounded shadow-sm">
+    <h3 class="text-primary">@DisplayName</h3>
+    <p><strong>Date:</strong> @DisplayDate.ToShortDateString()</p>
+    <p><strong>Location:</strong> @DisplayLocation</p>
+    <button class="btn btn-outline-primary" @onclick="ViewDetails">View Details</button>
+</div>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public string EventName { get; set; } = string.Empty;
+
+    [Parameter]
+    [EditorRequired]
+    public DateTime EventDate { get; set; } = DateTime.Now.Date;
+
+    [Parameter]
+    [EditorRequired]
+    public string EventLocation { get; set; } = string.Empty;
+
+    private string DisplayName => string.IsNullOrEmpty(EventName) ? "Unnamed Event" : EventName;
+    private DateTime DisplayDate => (EventDate == default(DateTime)) ? DateTime.Now.Date : EventDate;
+    private string DisplayLocation => string.IsNullOrEmpty(EventLocation) ? "Undisclosed Location" : EventLocation;
+
+    [Parameter]
+    public EventCallback<int> OnViewDetails { get; set; }
+
+    [Parameter]
+    public int EventId { get; set; }
+
+    private void ViewDetails()
+    {
+        OnViewDetails.InvokeAsync(EventId);
+    }
+}
+
+<style>
+    .event-card {
+        max-width: 300px;
+        background-color: #f8f9fa;
+        margin: 10px;
+        padding: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>

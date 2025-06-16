@@ -1,0 +1,39 @@
+@page "/events"
+@inject NavigationManager NavigationManager
+@using EventEaseApp.Models
+@using EventEaseApp.Components
+@using Microsoft.AspNetCore.Components.Web.Virtualization;
+
+<h1>Upcoming Events</h1>
+
+<div style="height: 600px; overflow-y: scroll; border: 1px solid #ddd; padding: 10px;">
+    <Virtualize Items="@Events" Context="eventItem" ItemSize="150">
+        <EventCard EventId="@eventItem.Id" EventName="@eventItem.Name" EventDate="@eventItem.Date"
+            EventLocation="@eventItem.Location" OnViewDetails="(() => NavigateToEventDetails(eventItem.Id))" />
+    </Virtualize>
+</div>
+
+<NavLink href="/registration" class="btn btn-success mt-4">Register for an Event</NavLink>
+
+@code {
+    private List<Event> Events { get; set; } = new List<Event>();
+
+    protected override void OnInitialized()
+    {
+        for (int i = 1; i <= 2000; i++)
+        {
+            Events.Add(new Event(
+            Id: i,
+            Name: $"Tech Innovators Summit {i}",
+            Date: DateTime.Now.AddDays(i * 5),
+            Location: $"Convention Center {i}"
+            ));
+        }
+    }
+
+    private void NavigateToEventDetails(int eventId)
+    {
+        Console.WriteLine($"Navigating to /events/details/{eventId}");
+        NavigationManager.NavigateTo($"/events/details/{eventId}");
+    }
+}

@@ -1,0 +1,76 @@
+@page "/events/details/{EventId:int}"
+@inject NavigationManager NavigationManager
+@inject EventEaseApp.Services.UserSessionService SessionService // Para verificar login
+@using EventEaseApp.Models
+
+<h1>Event Details</h1>
+
+@if (CurrentEvent != null)
+{
+    <h2>@CurrentEvent.Name</h2>
+    <p><strong>Date:</strong> @CurrentEvent.Date.ToLongDateString()</p>
+    <p><strong>Location:</strong> @CurrentEvent.Location</p>
+
+    @if (SessionService.IsLoggedIn)
+    {
+        <p>Welcome, @SessionService.CurrentUserName!</p>
+        <button class="btn btn-success" @onclick="ConfirmAttendance">Confirm Attendance</button>
+        @if (!string.IsNullOrEmpty(attendanceMessage))
+        {
+            <p class="mt-2 text-info">@attendanceMessage</p>
+        }
+    }
+    else
+    {
+        <p>Please <NavLink href="/login">log in</NavLink> to confirm your attendance.</p>
+    }
+}
+else
+{
+    <p>Event not found.</p>
+}
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event? CurrentEvent { get; set; }
+    private string attendanceMessage = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        var allEvents = GenerateDummyEvents(); // Recria a lista dummy
+        CurrentEvent = allEvents.FirstOrDefault(e => e.Id == EventId);
+
+        // Assinar para que a UI seja atualizada quando o status de login mudar
+        SessionService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        SessionService.OnChange -= StateHasChanged;
+    }
+
+    private void ConfirmAttendance()
+    {
+        // Lógica para confirmar presença
+        attendanceMessage = $"Attendance confirmed for {CurrentEvent?.Name}!";
+        Console.WriteLine($"Attendance confirmed for Event ID: {EventId} by {SessionService.CurrentUserName}");
+    }
+
+    // Função auxiliar para gerar a mesma lista de eventos do EventList
+    private List<Event> GenerateDummyEvents()
+    {
+        var events = new List<Event>();
+        for (int i = 1; i <= 2000; i++)
+        {
+            events.Add(new Event(
+            Id: i,
+            Name: $"Tech Innovators Summit {i}",
+            Date: DateTime.Now.AddDays(i * 5),
+            Location: $"Convention Center {i}"
+            ));
+        }
+        return events;
+    }
+}

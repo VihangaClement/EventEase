@@ -1,0 +1,65 @@
+@page "/registration"
+@using EventEaseApp.Models
+@inject NavigationManager NavigationManager
+
+<h1>Event Registration</h1>
+
+@if (registrationSuccess)
+{
+    <div class="alert alert-success" role="alert">
+        Registration successful for @registrationModel.Name!
+    </div>
+    <NavLink href="/events" class="btn btn-primary">Go to Events</NavLink>
+}
+else
+{
+    <EditForm Model="@registrationModel" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <InputText id="name" @bind-Value="registrationModel.Name" class="form-control" />
+            <ValidationMessage For="@(() => registrationModel.Name)" class="text-danger" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="email" class="form-label">Email:</label>
+            <InputText id="email" @bind-Value="registrationModel.Email" class="form-control" />
+            <ValidationMessage For="@(() => registrationModel.Email)" class="text-danger" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <InputText id="password" @bind-Value="registrationModel.Password" type="password" class="form-control" />
+            <ValidationMessage For="@(() => registrationModel.Password)" class="text-danger" />
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="confirmPassword" class="form-label">Confirm Password:</label>
+            <InputText id="confirmPassword" @bind-Value="registrationModel.ConfirmPassword" type="password"
+                class="form-control" />
+            <ValidationMessage For="@(() => registrationModel.ConfirmPassword)" class="text-danger" />
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Register</button>
+    </EditForm>
+}
+
+@code {
+    private RegistrationModel registrationModel = new RegistrationModel();
+    private bool registrationSuccess = false;
+
+    private void HandleValidSubmit()
+    {
+        // Simulate successful registration
+        Console.WriteLine($"Registration data: Name={registrationModel.Name}, Email={registrationModel.Email}");
+        registrationSuccess = true;
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        Console.WriteLine("Registration failed due to validation errors.");
+        registrationSuccess = false;
+    }
+}
